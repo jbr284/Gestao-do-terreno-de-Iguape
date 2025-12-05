@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 
 // --- COLE SUAS CHAVES DO FIREBASE AQUI ---
 const firebaseConfig = {
@@ -13,68 +14,122 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-// Funções Utilitárias
+let idParcelaAtual = null;
+
 const formatarDinheiro = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 const formatarData = (ts) => new Date(ts.seconds * 1000).toLocaleDateString('pt-BR');
 
 // --- FUNÇÕES GLOBAIS ---
-
 window.mudarAba = function(aba) {
-    document.getElementById('aba-entrada').classList.remove('active');
-    document.getElementById('aba-financiamento').classList.remove('active');
-    
-    const btns = document.getElementsByClassName('tab-btn');
-    for(let i=0; i<btns.length; i++) btns[i].classList.remove('active');
-
+    document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
     document.getElementById('aba-' + aba).classList.add('active');
     
-    if(aba === 'entrada') btns[0].classList.add('active');
-    else btns[1].classList.add('active');
+    const btns = document.querySelectorAll('.tab-btn');
+    if(aba === 'entrada') btns[0].classList.add('active'); else btns[1].classList.add('active');
 }
 
-window.toggleAno = function(ano) {
-    // O ID agora precisa ser único, então usamos o prefixo que vem no parâmetro (ex: 'entrada-2024' ou 'financ-2025')
-    const conteudo = document.getElementById('wrapper-' + ano);
-    const header = document.getElementById('header-' + ano);
-    
-    if(!conteudo || !header) return;
-
-    if (conteudo.classList.contains('visivel')) {
-        conteudo.classList.remove('visivel');
-        header.classList.remove('aberto');
-    } else {
-        conteudo.classList.add('visivel');
-        header.classList.add('aberto');
+window.toggleAno = function(id) {
+    const conteudo = document.getElementById('wrapper-' + id);
+    const header = document.getElementById('header-' + id);
+    if(conteudo) {
+        conteudo.classList.toggle('visivel');
+        header.classList.toggle('aberto');
     }
 }
 
-// Função auxiliar para gerar o HTML do Acordeão
-function gerarHtmlPorAno(dadosPorAno, contagemPorAno, prefixoId) {
-    let htmlFinal = "";
-    Object.keys(dadosPorAno).sort().forEach(ano => {
-        // Criamos um ID único combinando o prefixo (entrada/financ) + ano
-        const idUnico = `${prefixoId}-${ano}`;
-        
-        htmlFinal += `
-            <div class="ano-container">
-                <div id="header-${idUnico}" class="ano-header" onclick="toggleAno('${idUnico}')">
-                    <span>📅 ${ano} <small style="color:#777; font-weight:normal">(${contagemPorAno[ano]} parcelas)</small></span>
-                    <span class="seta">▶</span>
-                </div>
-                
-                <div id="wrapper-${idUnico}" class="ano-wrapper">
-                    <div class="grid-parcelas">
-                        ${dadosPorAno[ano]}
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-    return htmlFinal;
+window.fecharModal = function() {
+    document.getElementById('modalDetalhes').classList.remove('aberto');
+    idParcelaAtual = null;
 }
 
-// --- LÓGICA PRINCIPAL ---
+window.abrirDetalhes = async function(id) {
+    idParcelaAtual = id;
+    const modal = document.getElementById('modalDetalhes');
+    
+    // Carrega dados atualizados
+    const docRef = doc(db, "parcelas", id);
+    const docSnap = await getDoc(docRef);
+    const d = docSnap.data();
+
+    document.getElementById('modalTitulo').innerText = `Parcela #${d.numero}`;
+    document.getElementById('modalValor').innerText = formatarDinheiro(d.valor_original);
+    document.getElementById('modalVencimento').innerText = formatarData(d.vencimento);
+
+    const aviso = document.getElementById('modalAvisoDesconto');
+    if(d.regra_desconto && d.regra_desconto.tem_desconto) {
+        aviso.style.display = 'block';
+        const vlrDesc = d.valor_original - d.regra_desconto.valor_do_desconto;
+        aviso.innerHTML = `💡 Desconto: Pague <b>${formatarDinheiro(vlrDesc)}</b> até dia ${d.regra_desconto.ate_dia}.`;
+    } else {
+        aviso.style.display = 'none';
+    }
+
+    const areaUpload = document.querySelector('.area-upload');
+    const areaComprovante = document.getElementById('areaComprovante');
+    const btnConfirmar = document.getElementById('btnConfirmar');
+
+    if (d.status === 'pago') {
+        areaUpload.style.display = 'none';
+        btnConfirmar.style.display = 'none';
+        areaComprovante.style.display = 'block';
+        if(d.comprovante_url) {
+            document.getElementById('linkComprovante').href = d.comprovante_url;
+            document.getElementById('linkComprovante').innerText = "📄 Ver Comprovante";
+        } else {
+            document.getElementById('linkComprovante').innerText = "✅ Pago (Sem comprovante)";
+            document.getElementById('linkComprovante').removeAttribute('href');
+        }
+    } else {
+        areaUpload.style.display = 'block';
+        btnConfirmar.style.display = 'block';
+        areaComprovante.style.display = 'none';
+        document.getElementById('inputArquivo').value = "";
+    }
+    modal.classList.add('aberto');
+}
+
+window.realizarPagamento = async function() {
+    const arquivo = document.getElementById('inputArquivo').files[0];
+    const btn = document.getElementById('btnConfirmar');
+
+    if (!arquivo) {
+        if(!confirm("Dar baixa sem anexar comprovante?")) return;
+    }
+
+    btn.disabled = true;
+    btn.innerText = "⏳ Enviando...";
+
+    try {
+        let downloadURL = null;
+        if (arquivo) {
+            const storageRef = ref(storage, `comprovantes/${idParcelaAtual}_${arquivo.name}`);
+            const snapshot = await uploadBytes(storageRef, arquivo);
+            downloadURL = await getDownloadURL(snapshot.ref);
+        }
+
+        const docRef = doc(db, "parcelas", idParcelaAtual);
+        await updateDoc(docRef, {
+            status: "pago",
+            data_pagamento: new Date(),
+            comprovante_url: downloadURL
+        });
+
+        alert("Pagamento registrado!");
+        window.fecharModal();
+        carregarDados();
+
+    } catch (error) {
+        console.error(error);
+        alert("Erro: " + error.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "✅ Confirmar Pagamento";
+    }
+}
+
 async function carregarDados() {
     const q = query(collection(db, "parcelas"), orderBy("vencimento"));
     const snapshot = await getDocs(q);
@@ -82,33 +137,24 @@ async function carregarDados() {
     const containerEntrada = document.getElementById('listaEntrada');
     const containerFinanc = document.getElementById('containerFinanciamento');
     
-    // Agora ambos usam a lógica de agrupamento
-    let dadosEntradaPorAno = {};
-    let contagemEntrada = {};
-    let dadosFinancPorAno = {}; 
-    let contagemFinanc = {};
-    
-    let totalEntrada = 0;
-    let totalFinanc = 0;
+    let dadosEntrada = {}; let contEntrada = {};
+    let dadosFinanc = {}; let contFinanc = {};
+    let totE = 0; let totF = 0;
 
-    snapshot.forEach((doc) => {
-        const d = doc.data();
-        const id = doc.id;
+    snapshot.forEach((docSnap) => {
+        const d = docSnap.data();
+        const id = docSnap.id;
         
-        // Cálculos de Total
         if(d.status === 'pendente') {
-            if(d.tipo === 'entrada') totalEntrada += d.valor_original;
-            else totalFinanc += d.valor_original;
+            if(d.tipo === 'entrada') totE += d.valor_original; else totF += d.valor_original;
         }
 
-        // HTML do Desconto
-        let htmlDesconto = "";
+        let htmlDesc = "";
         if(d.regra_desconto && d.regra_desconto.tem_desconto) {
-            const vlrComDesc = d.valor_original - d.regra_desconto.valor_do_desconto;
-            htmlDesconto = `<div class="regra-desconto">⚡ Pague <b>${formatarDinheiro(vlrComDesc)}</b> até dia ${d.regra_desconto.ate_dia}</div>`;
+            const v = d.valor_original - d.regra_desconto.valor_do_desconto;
+            htmlDesc = `<div class="regra-desconto">⚡ Pague <b>${formatarDinheiro(v)}</b> até dia ${d.regra_desconto.ate_dia}</div>`;
         }
 
-        // HTML do Card
         const card = `
             <div class="parcela-card ${d.status === 'pago' ? 'pago' : ''}">
                 <div class="top-row">
@@ -116,40 +162,47 @@ async function carregarDados() {
                     <span class="status ${d.status === 'pago' ? 'pago' : 'pendente'}">${d.status}</span>
                 </div>
                 <div class="valor">${formatarDinheiro(d.valor_original)}</div>
-                <div class="data">Vencimento: <strong>${formatarData(d.vencimento)}</strong></div>
-                ${htmlDesconto}
-                <button class="btn-detalhes" onclick="alert('ID: ${id}')">📂 Detalhes</button>
+                <div class="data">Venc: <strong>${formatarData(d.vencimento)}</strong></div>
+                ${htmlDesc}
+                <button class="btn-detalhes" onclick="abrirDetalhes('${id}')">
+                    ${d.status === 'pago' ? '🔍 Ver Recibo' : '📂 Pagar / Anexar'}
+                </button>
             </div>
         `;
 
-        // Pega o Ano da parcela
         const ano = new Date(d.vencimento.seconds * 1000).getFullYear();
-
-        // Distribui nas caixas certas (Entrada ou Financiamento)
         if(d.tipo === 'entrada') {
-            if(!dadosEntradaPorAno[ano]) { dadosEntradaPorAno[ano] = ""; contagemEntrada[ano] = 0; }
-            dadosEntradaPorAno[ano] += card;
-            contagemEntrada[ano]++;
+            if(!dadosEntrada[ano]) { dadosEntrada[ano] = ""; contEntrada[ano] = 0; }
+            dadosEntrada[ano] += card; contEntrada[ano]++;
         } else {
-            if(!dadosFinancPorAno[ano]) { dadosFinancPorAno[ano] = ""; contagemFinanc[ano] = 0; }
-            dadosFinancPorAno[ano] += card;
-            contagemFinanc[ano]++;
+            if(!dadosFinanc[ano]) { dadosFinanc[ano] = ""; contFinanc[ano] = 0; }
+            dadosFinanc[ano] += card; contFinanc[ano]++;
         }
     });
 
-    // Renderiza Entrada (Agora usando a função de acordeão)
-    // Se não tiver nenhuma parcela, mostra aviso, senão gera o acordeão
-    if (Object.keys(dadosEntradaPorAno).length === 0) {
-        containerEntrada.innerHTML = '<p style="text-align:center">Nenhuma parcela encontrada.</p>';
-    } else {
-        containerEntrada.innerHTML = gerarHtmlPorAno(dadosEntradaPorAno, contagemEntrada, 'entrada');
-    }
-    document.getElementById('resumoEntrada').innerText = formatarDinheiro(totalEntrada);
+    const gerarHtml = (dados, cont, prefixo) => {
+        let html = "";
+        Object.keys(dados).sort().forEach(ano => {
+            const uid = `${prefixo}-${ano}`;
+            html += `
+            <div class="ano-container">
+                <div id="header-${uid}" class="ano-header" onclick="toggleAno('${uid}')">
+                    <span>📅 ${ano} <small>(${cont[ano]} parcelas)</small></span>
+                    <span class="seta">▶</span>
+                </div>
+                <div id="wrapper-${uid}" class="ano-wrapper"><div class="grid-parcelas">${dados[ano]}</div></div>
+            </div>`;
+        });
+        return html;
+    };
 
-    // Renderiza Financiamento
-    containerFinanc.innerHTML = gerarHtmlPorAno(dadosFinancPorAno, contagemFinanc, 'financ');
-    document.getElementById('resumoFinanc').innerText = formatarDinheiro(totalFinanc);
+    if(Object.keys(dadosEntrada).length === 0) containerEntrada.innerHTML = "<p style='text-align:center; padding:20px'>Nenhuma parcela encontrada.</p>";
+    else containerEntrada.innerHTML = gerarHtml(dadosEntrada, contEntrada, 'ent');
+
+    containerFinanc.innerHTML = gerarHtml(dadosFinanc, contFinanc, 'fin');
+
+    document.getElementById('resumoEntrada').innerText = formatarDinheiro(totE);
+    document.getElementById('resumoFinanc').innerText = formatarDinheiro(totF);
 }
 
 carregarDados();
-
