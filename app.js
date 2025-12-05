@@ -1,9 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-// --- ATENÇÃO: COLE SUAS CHAVES AQUI ---
+// --- ATENÇÃO: COLE SUAS CHAVES AQUI (MANTENHA O FORMATO CORRETO) ---
 const firebaseConfig = {
   apiKey: "AIzaSyBh7HtgTJcLCa4hHAhbZGXcfE8pOHTJLso",
   authDomain: "gestao-do-terreno-iguape.firebaseapp.com",
@@ -11,7 +11,7 @@ const firebaseConfig = {
   storageBucket: "gestao-do-terreno-iguape.firebasestorage.app",
   messagingSenderId: "111574998276",
   appId: "1:111574998276:web:a490d5ee802cb26a3bc451"
-};
+}; 
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -23,7 +23,7 @@ let idParcelaAtual = null;
 const formatarDinheiro = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 const formatarData = (ts) => new Date(ts.seconds * 1000).toLocaleDateString('pt-BR');
 
-// --- SISTEMA DE LOGIN ---
+// --- SISTEMA DE LOGIN E LOGOUT ---
 onAuthStateChanged(auth, (user) => {
     const telaLogin = document.getElementById('telaLogin');
     if (user) {
@@ -47,6 +47,12 @@ window.fazerLogin = function() {
             msg.innerText = "Erro: Login incorreto.";
             msg.style.display = 'block';
         });
+}
+
+window.sair = function() {
+    signOut(auth).then(() => {
+        location.reload();
+    });
 }
 
 // --- FUNÇÕES GLOBAIS ---
@@ -118,8 +124,7 @@ window.abrirDetalhes = async function(id) {
         }
         modal.classList.add('aberto');
     } catch(e) {
-        alert("Sua sessão expirou ou você não tem permissão.");
-        location.reload();
+        alert("Erro de permissão ou conexão.");
     }
 }
 
@@ -238,4 +243,3 @@ async function carregarDados() {
         console.error("Erro ao carregar (Permissão):", e);
     }
 }
-
