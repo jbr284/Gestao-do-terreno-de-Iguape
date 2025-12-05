@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Terreno - Gestão</title>
+    <title>Gestão do Terreno</title>
+    
     <link rel="stylesheet" href="style.css">
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/25/25694.png">
 </head>
 <body>
 
@@ -31,7 +36,46 @@
         <div id="containerFinanciamento">Carregando...</div>
     </div>
 
-    <script type="module" src="app.js"></script>
-</body>
+    <div id="modalDetalhes" class="modal-overlay">
+        <div class="modal-content">
+            <h2 id="modalTitulo">Parcela #...</h2>
+            
+            <div class="modal-info">
+                <p>Valor Original: <strong id="modalValor">...</strong></p>
+                <p>Vencimento: <strong id="modalVencimento">...</strong></p>
+                <div id="modalAvisoDesconto" class="aviso-modal"></div>
+            </div>
 
+            <hr>
+
+            <div class="area-upload">
+                <label>📸 Anexar Comprovante:</label>
+                <input type="file" id="inputArquivo" accept="image/*, application/pdf">
+            </div>
+
+            <div class="modal-botoes">
+                <button class="btn-cancelar" onclick="fecharModal()">Fechar</button>
+                <button id="btnConfirmar" class="btn-confirmar" onclick="realizarPagamento()">
+                    ✅ Confirmar Pagamento
+                </button>
+            </div>
+            
+            <div id="areaComprovante" style="display:none; margin-top:15px; text-align:center;">
+                <a id="linkComprovante" href="#" target="_blank" class="btn-ver-comprovante">📄 Ver Comprovante Salvo</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW registrado!', reg.scope))
+                    .catch(err => console.log('Erro SW:', err));
+            });
+        }
+    </script>
+</body>
 </html>
