@@ -1,29 +1,11 @@
-:root {
-    --primary: #2c3e50;
-    --accent: #3498db;
-    --success: #27ae60;
-    --bg: #f4f6f9;
-    --tab-inactive: #e0e0e0;
-}
+:root { --primary: #2c3e50; --accent: #3498db; --success: #27ae60; --bg: #f4f6f9; --tab-inactive: #e0e0e0; }
 
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: var(--bg);
-    margin: 0;
-    padding: 20px;
-    color: #333;
-    padding-bottom: 80px;
-}
-
+body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; color: #333; padding-bottom: 80px; }
 .header { text-align: center; margin-bottom: 20px; }
 
 /* ABAS */
 .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-.tab-btn {
-    padding: 12px 30px; border: none; border-radius: 25px; 
-    font-size: 1.1em; font-weight: bold; cursor: pointer;
-    background-color: var(--tab-inactive); color: #777; transition: all 0.3s;
-}
+.tab-btn { padding: 12px 30px; border: none; border-radius: 25px; font-size: 1.1em; font-weight: bold; cursor: pointer; background-color: var(--tab-inactive); color: #777; transition: all 0.3s; }
 .tab-btn.active { background-color: var(--primary); color: white; box-shadow: 0 4px 10px rgba(44, 62, 80, 0.3); }
 
 .tab-content { display: none; }
@@ -31,71 +13,35 @@ body {
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* RESUMO */
-.resumo-box {
-    background: white; padding: 20px; border-radius: 10px; 
-    text-align: center; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
+.resumo-box { background: white; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 .resumo-valor { font-size: 2em; font-weight: bold; color: var(--primary); }
 
-/* ACORDEÃO (ANOS) */
+/* ACORDEÃO */
 .ano-container { margin-bottom: 15px; }
-.ano-header {
-    background-color: white; color: var(--primary); padding: 15px 20px; 
-    border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer;
-    display: flex; justify-content: space-between; align-items: center;
-    border-left: 5px solid var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    transition: background 0.2s; user-select: none;
-}
+.ano-header { background-color: white; color: var(--primary); padding: 15px 20px; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: background 0.2s; user-select: none; }
 .ano-header:hover { background-color: #f1f1f1; }
-
 .seta { transition: transform 0.3s; font-size: 0.8em; }
 .ano-header.aberto .seta { transform: rotate(90deg); }
-
-/* Wrapper controla visibilidade para evitar conflito de CSS */
 .ano-wrapper { display: none; margin-top: 15px; }
 .ano-wrapper.visivel { display: block; }
 
 /* PARCELAS */
-.grid-parcelas {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;
-}
-.parcela-card {
-    background: white; border-radius: 10px; padding: 15px; 
-    border-left: 5px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
+.grid-parcelas { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+.parcela-card { background: white; border-radius: 10px; padding: 15px; border-left: 5px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 .parcela-card.pago { border-left-color: var(--success); background-color: #fafffb; }
-
 .top-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
-.status {
-    font-size: 0.8em; padding: 3px 8px; border-radius: 12px; 
-    background: #eee; font-weight: bold; text-transform: uppercase;
-}
+.status { font-size: 0.8em; padding: 3px 8px; border-radius: 12px; background: #eee; font-weight: bold; text-transform: uppercase; }
 .status.pago { background: #d4edda; color: #155724; }
-
 .valor { font-size: 1.4em; font-weight: bold; color: var(--primary); }
 .data { color: #555; margin: 5px 0; }
-.regra-desconto {
-    font-size: 0.85em; background-color: #e3f2fd; color: #1565c0; 
-    padding: 8px; border-radius: 6px; margin-top: 10px; display: block;
-}
-.btn-detalhes {
-    display: block; width: 100%; padding: 10px; margin-top: 10px;
-    background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;
-}
+.regra-desconto { font-size: 0.85em; background-color: #e3f2fd; color: #1565c0; padding: 8px; border-radius: 6px; margin-top: 10px; display: block; }
+.btn-detalhes { display: block; width: 100%; padding: 10px; margin-top: 10px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer; }
 
 /* MODAL */
-.modal-overlay {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.5); z-index: 1000;
-    justify-content: center; align-items: center;
-}
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center; }
 .modal-overlay.aberto { display: flex; }
-.modal-content {
-    background: white; width: 90%; max-width: 400px; padding: 20px; 
-    border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: subir 0.3s;
-}
+.modal-content { background: white; width: 90%; max-width: 400px; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: subir 0.3s; }
 @keyframes subir { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
 .modal-info p { margin: 10px 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
 .aviso-modal { color: #2980b9; font-size: 0.9em; margin-bottom: 10px; background: #eaf6ff; padding: 8px; border-radius: 4px; display: none; }
 .area-upload { margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px dashed #ccc; }
@@ -104,3 +50,10 @@ body {
 .btn-cancelar { flex: 1; background: #e74c3c; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; }
 .btn-confirmar { flex: 2; background: #27ae60; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 .btn-ver-comprovante { display: block; padding: 10px; background: #3498db; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; }
+
+/* TELA DE LOGIN */
+.login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2c3e50; z-index: 2000; display: flex; justify-content: center; align-items: center; }
+.login-box { background: white; padding: 30px; border-radius: 10px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+.login-box h2 { color: var(--primary); margin-bottom: 5px; }
+.login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+.login-box button { width: 100%; padding: 12px; background: var(--success); color: white; border: none; border-radius: 5px; font-size: 1.1em; font-weight: bold; cursor: pointer; }
