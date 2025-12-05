@@ -1,6 +1,6 @@
 {
-  "name": "Gestão do Terreno",
-  "short_name": "Meu Terreno",
+  "name": "Gestão do Terreno de Iguape",
+  "short_name": "Terreno de Iguape",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f4f6f9",
@@ -19,3 +19,4 @@
     }
   ]
 }
+
