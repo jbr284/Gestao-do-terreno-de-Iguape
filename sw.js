@@ -1,4 +1,4 @@
-const CACHE_NAME = 'terreno-v4'; // Mudei a versão para limpar erros antigos
+const CACHE_NAME = 'terreno-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -22,13 +22,11 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Ignora requisições do Firebase e externas
   if (event.request.url.includes('firestore.googleapis.com') || 
       event.request.url.includes('firebase') ||
       event.request.url.includes('storage')) {
     return;
   }
-  
   event.respondWith(
     caches.match(event.request).then((res) => res || fetch(event.request))
   );
