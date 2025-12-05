@@ -2,15 +2,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebas
 import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 
-// --- COLE SUAS CHAVES DO FIREBASE AQUI ---
+// ⚠️ ATENÇÃO: NÃO ESQUEÇA DE COLAR SUAS CHAVES AQUI NOVAMENTE!
 const firebaseConfig = {
   apiKey: "AIzaSyBh7HtgTJcLCa4hHAhbZGXcfE8pOHTJLso",
   authDomain: "gestao-do-terreno-iguape.firebaseapp.com",
   projectId: "gestao-do-terreno-iguape",
   storageBucket: "gestao-do-terreno-iguape.firebasestorage.app",
   messagingSenderId: "111574998276",
-  appId: "1:111574998276:web:a490d5ee802cb26a3bc451"
-};
+  appId: "1:111574998276:web:a490d5ee802cb26a3bc451"};
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -49,12 +48,13 @@ window.abrirDetalhes = async function(id) {
     idParcelaAtual = id;
     const modal = document.getElementById('modalDetalhes');
     
-    // Carrega dados atualizados
     const docRef = doc(db, "parcelas", id);
     const docSnap = await getDoc(docRef);
     const d = docSnap.data();
 
-    document.getElementById('modalTitulo').innerText = `Parcela #${d.numero}`;
+    // --- MUDANÇA AQUI: Título da Janela com "Nº" ---
+    document.getElementById('modalTitulo').innerText = `Parcela Nº ${d.numero}`;
+    
     document.getElementById('modalValor').innerText = formatarDinheiro(d.valor_original);
     document.getElementById('modalVencimento').innerText = formatarData(d.vencimento);
 
@@ -155,10 +155,11 @@ async function carregarDados() {
             htmlDesc = `<div class="regra-desconto">⚡ Pague <b>${formatarDinheiro(v)}</b> até dia ${d.regra_desconto.ate_dia}</div>`;
         }
 
+        // --- MUDANÇA AQUI: Formatação "Nº X" ---
         const card = `
             <div class="parcela-card ${d.status === 'pago' ? 'pago' : ''}">
                 <div class="top-row">
-                    <span style="font-weight:bold; color:#777">#${d.numero}</span>
+                    <span style="font-weight:bold; color:#777">Nº ${d.numero}</span>
                     <span class="status ${d.status === 'pago' ? 'pago' : 'pendente'}">${d.status}</span>
                 </div>
                 <div class="valor">${formatarDinheiro(d.valor_original)}</div>
