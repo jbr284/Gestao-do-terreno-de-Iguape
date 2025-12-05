@@ -10,7 +10,7 @@ const firebaseConfig = {
   projectId: "gestao-do-terreno-iguape",
   storageBucket: "gestao-do-terreno-iguape.firebasestorage.app",
   messagingSenderId: "111574998276",
-  appId: "1:111574998276:web:a490d5ee802cb26a3bc451"};
+  appId: "1:111574998276:web:a490d5ee802cb26a3bc451"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -238,3 +238,4 @@ async function carregarDados() {
         console.error("Erro ao carregar (Permissão):", e);
     }
 }
+
