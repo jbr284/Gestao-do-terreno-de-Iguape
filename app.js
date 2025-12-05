@@ -3,7 +3,12 @@ import { getFirestore, collection, getDocs, query, orderBy } from "https://www.g
 
 // --- COLE SUAS CHAVES DO FIREBASE AQUI ---
 const firebaseConfig = {
-    // ... SUAS CHAVES AQUI ...
+  apiKey: "AIzaSyBh7HtgTJcLCa4hHAhbZGXcfE8pOHTJLso",
+  authDomain: "gestao-do-terreno-iguape.firebaseapp.com",
+  projectId: "gestao-do-terreno-iguape",
+  storageBucket: "gestao-do-terreno-iguape.firebasestorage.app",
+  messagingSenderId: "111574998276",
+  appId: "1:111574998276:web:a490d5ee802cb26a3bc451"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -147,3 +152,4 @@ async function carregarDados() {
 }
 
 carregarDados();
+
