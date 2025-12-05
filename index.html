@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Terreno - Gestão</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="header"><h1>🏡 Gestão do Terreno</h1></div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="mudarAba('entrada')">Entrada</button>
+        <button class="tab-btn" onclick="mudarAba('financiamento')">Financiamento</button>
+    </div>
+
+    <div id="aba-entrada" class="tab-content active">
+        <div class="resumo-box">
+            <div>Restante Entrada</div>
+            <div id="resumoEntrada" class="resumo-valor">R$ ...</div>
+        </div>
+        <div id="listaEntrada" class="grid-parcelas">Carregando...</div>
+    </div>
+
+    <div id="aba-financiamento" class="tab-content">
+        <div class="resumo-box">
+            <div>Saldo Financiamento</div>
+            <div id="resumoFinanc" class="resumo-valor">R$ ...</div>
+        </div>
+        <div id="containerFinanciamento">Carregando...</div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
