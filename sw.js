@@ -5,6 +5,8 @@ const ASSETS = [
   './style.css',
   './app.js',
   './manifest.json'
+  './icons/icon-192x192.png', // <--- NOVO
+  './icons/icon-512x512.png'  // <--- NOVO
 ];
 
 self.addEventListener('install', (event) => {
@@ -29,3 +31,4 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request).then((res) => res || fetch(event.request))
   );
 });
+
