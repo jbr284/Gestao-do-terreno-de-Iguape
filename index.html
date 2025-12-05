@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestão do Terreno</title>
@@ -14,8 +13,18 @@
     <link rel="icon" type="image/png" href="icons/icon-192x192.png">
     <link rel="apple-touch-icon" href="icons/icon-512x512.png">
 </head>
-</head>
 <body>
+
+    <div id="telaLogin" class="login-overlay">
+        <div class="login-box">
+            <h2>🔐 Acesso Restrito</h2>
+            <p>Sistema de Gestão Familiar</p>
+            <input type="email" id="emailLogin" placeholder="E-mail" />
+            <input type="password" id="senhaLogin" placeholder="Senha" />
+            <button onclick="fazerLogin()">Entrar</button>
+            <p id="msgErroLogin" style="color:red; display:none; margin-top:10px; font-size:0.9em;"></p>
+        </div>
+    </div>
 
     <div class="header"><h1>🏡 Gestão do Terreno</h1></div>
 
@@ -42,7 +51,7 @@
 
     <div id="modalDetalhes" class="modal-overlay">
         <div class="modal-content">
-            <h2 id="modalTitulo">Parcela #...</h2>
+            <h2 id="modalTitulo">Parcela...</h2>
             
             <div class="modal-info">
                 <p>Valor Original: <strong id="modalValor">...</strong></p>
@@ -60,12 +69,12 @@
             <div class="modal-botoes">
                 <button class="btn-cancelar" onclick="fecharModal()">Fechar</button>
                 <button id="btnConfirmar" class="btn-confirmar" onclick="realizarPagamento()">
-                    ✅ Confirmar Pagamento
+                    ✅ Confirmar
                 </button>
             </div>
             
             <div id="areaComprovante" style="display:none; margin-top:15px; text-align:center;">
-                <a id="linkComprovante" href="#" target="_blank" class="btn-ver-comprovante">📄 Ver Comprovante Salvo</a>
+                <a id="linkComprovante" href="#" target="_blank" class="btn-ver-comprovante">📄 Ver Comprovante</a>
             </div>
         </div>
     </div>
@@ -75,12 +84,9 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW registrado!', reg.scope))
-                    .catch(err => console.log('Erro SW:', err));
+                navigator.serviceWorker.register('./sw.js').catch(err => console.log('Erro SW:', err));
             });
         }
     </script>
 </body>
 </html>
-
