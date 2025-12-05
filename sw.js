@@ -1,4 +1,4 @@
-const CACHE_NAME = 'terreno-v5';
+const CACHE_NAME = 'terreno-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -31,3 +31,4 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request).then((res) => res || fetch(event.request))
   );
 });
+
