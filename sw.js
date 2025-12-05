@@ -1,12 +1,12 @@
-const CACHE_NAME = 'terreno-v2';
+const CACHE_NAME = 'terreno-v4'; // Mudei a versão para limpar erros antigos
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './app.js',
-  './manifest.json'
-  './icons/icon-192x192.png', // <--- NOVO
-  './icons/icon-512x512.png'  // <--- NOVO
+  './manifest.json',
+  './icons/icon-192x192.png',
+  './icons/icon-512x512.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -22,13 +22,14 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Ignora requisições do Firebase e externas
   if (event.request.url.includes('firestore.googleapis.com') || 
       event.request.url.includes('firebase') ||
       event.request.url.includes('storage')) {
     return;
   }
+  
   event.respondWith(
     caches.match(event.request).then((res) => res || fetch(event.request))
   );
 });
-
